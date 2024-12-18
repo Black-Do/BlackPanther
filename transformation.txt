@@ -1,0 +1,66 @@
+#include <iostream>
+#include<GL/glut.h>
+using namespace std;
+
+int x1 = 100,Y1 = 100,x2 = 200,y2 = 100,x3 = 100,y3 = 200,tx = 10,ty =10,sx = 4,sy = 4;
+
+int round (float a) {return (int) (a+0.5);}
+
+void DDALine(int x1, int y1, int x2, int y2) {
+	int dx = x2 - x1; 
+	int dy = y2 - y1;
+	int steps;
+	
+	if (abs(dx)>abs(dy)) {steps = abs(dx);}
+	else {steps = abs(dy);}
+	
+	float xinc = dx/(float)steps;
+	float yinc = dy/(float)steps;
+	
+	float x = x1, y = y1;
+	
+	glBegin(GL_POINTS);
+	glVertex2d(x,y);
+	
+	for (int i = 0; i < steps; i++) {
+		x = x+xinc;
+		y = y+yinc;
+		glVertex2d(round(x),round(y));
+	}
+	glEnd();
+	glFlush();
+}
+
+void trans() {
+	x1 = x1*sx + tx;
+	Y1 = Y1*sy + ty;
+	x2 = x2*sx + tx;
+	y2 = y2*sy + ty;
+	x3 = x3*sx + tx;
+	y3 = y3*sy + ty;
+}
+
+void Draw() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1,1,0);
+	DDALine(x1,Y1,x2,y2);
+	DDALine(x3,y3,x2,y2);
+	DDALine(x1,Y1,x3,y3);
+	trans();
+	glColor3f(0,0,1);
+	DDALine(x1,Y1,x2,y2);
+	DDALine(x3,y3,x2,y2);
+	DDALine(x1,Y1,x3,y3);
+}
+
+int main(int argc, char** argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+	glutInitWindowPosition(0,0);
+	glutInitWindowSize(800,600);
+	glutCreateWindow("win");
+	glClearColor(0.0,0.0,0.0,0);
+	gluOrtho2D(0,800,0,600);
+	glutDisplayFunc(Draw);
+	glutMainLoop();
+}

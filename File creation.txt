@@ -1,0 +1,44 @@
+#include <iostream>
+#include <fstream>  // for file handling
+#include <string>
+
+using namespace std;
+
+int main() {
+    // Create an output file stream object and open the file to write data
+    ofstream outFile("output.txt");
+
+    // Check if the file opened successfully
+    if (!outFile) {
+        cout << "Error opening the file for writing!" << endl;
+        return 1;
+    }
+
+    // Writing information to the file
+    outFile << "Hello, this is a test file." << endl;
+    outFile << "This file contains some sample text." << endl;
+    outFile << "C++ file handling is simple." << endl;
+
+    // Close the output file
+    outFile.close();
+
+    // Create an input file stream object to read the data back from the file
+    ifstream inFile("output.txt");
+
+    // Check if the file opened successfully
+    if (!inFile) {
+        cout << "Error opening the file for reading!" << endl;
+        return 1;
+    }
+
+    // Reading information from the file and displaying it on the console
+    string line;
+    while (getline(inFile, line)) {
+        cout << line << endl;
+    }
+
+    // Close the input file
+    inFile.close();
+
+    return 0;
+}

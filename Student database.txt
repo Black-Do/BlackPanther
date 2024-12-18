@@ -1,0 +1,194 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class student
+{
+public:
+    static int record_count;
+
+    string name = "N/A";
+    string rollno = "N/A";
+    string cname = "N/A";
+    string div = "N/A";
+    string dob = "N/A";
+    string blood = "N/A";
+    string add = "N/A";
+    string num = "N/A";
+    string licence = "N/A";
+
+    student()
+    {
+        record_count++;
+    }
+
+    static int getcount()
+    {
+        return record_count;
+    }
+
+    ~student() {}
+    
+    void modify_data()
+    {
+        cout << "Modify name: ";
+        cin >> name;
+        cout << "Modify Roll no: ";
+        cin >> rollno;
+        cout << "Modify class name: ";
+        cin >> cname;
+        cout << "Modify Division: ";
+        cin >> div;
+        cout << "Modify Date of Birth: ";
+        cin >> dob;
+        cout << "Modify Blood Group: ";
+        cin >> blood;
+        cout << "Modify Address: ";
+        cin >> add;
+        cout << "Modify Number: ";
+        cin >> num;
+        cout << "Modify Licence: ";
+        cin >> licence;
+    }
+};
+
+int student::record_count = 0;
+
+class studentinfo
+{
+public:
+    void print_header()
+    {
+        cout << left << setw(20) << "Name"
+             << setw(15) << "Roll No"
+             << setw(10) << "Class"
+             << setw(10) << "Division"
+             << setw(15) << "Date of Birth"
+             << setw(15) << "Blood Group"
+             << setw(25) << "Address"
+             << setw(15) << "Number"
+             << setw(20) << "Licence" << endl;
+
+        cout << string(165, '-') << endl;
+    }
+
+    void display(student *s)
+    {
+        cout << left << setw(20) << s->name
+             << setw(15) << s->rollno
+             << setw(10) << s->cname
+             << setw(10) << s->div
+             << setw(15) << s->dob
+             << setw(15) << s->blood
+             << setw(25) << s->add
+             << setw(15) << s->num
+             << setw(20) << s->licence << endl;
+
+        cout << string(165, '-') << endl;
+    }
+
+    void get_data(student *s)
+    {
+        cout << "Enter name: ";
+        cin >> s->name;
+        cout << "Enter Roll no: ";
+        cin >> s->rollno;
+        cout << "Enter class name: ";
+        cin >> s->cname;
+        cout << "Enter Division: ";
+        cin >> s->div;
+        cout << "Enter Date of Birth: ";
+        cin >> s->dob;
+        cout << "Enter Blood Group: ";
+        cin >> s->blood;
+        cout << "Enter Address: ";
+        cin >> s->add;
+        cout << "Enter Number: ";
+        cin >> s->num;
+        cout << "Enter Licence: ";
+        cin >> s->licence;
+        cout << endl;
+    }
+
+    void modify_data(student *s)
+    {
+        cout << "Modify the following details:" << endl;
+        s->modify_data();
+    }
+
+    ~studentinfo() {}
+};
+
+int main()
+{
+    student *s[10];
+    studentinfo *si = new studentinfo; // Initialize the studentinfo object
+    int count = 0;
+    int choice;
+    char ch;
+
+    do
+    {
+        s[count] = new student; // Dynamic allocation of student object
+        si->get_data(s[count]); // Collect data from the user
+        count++;
+
+        cout << "Add data for more students (y/n)? ";
+        cin >> ch;
+
+        if (ch == 'n' || ch == 'N')
+        {
+            break;
+        }
+
+    } while (count < 10);
+
+    cout << "\nPrinting the data\n" << endl;
+    si->print_header();
+    if (count == 0)
+    {
+        si->display(new student); // Display a default student
+    }
+    else
+    {
+        for (int i = 0; i < count; i++)
+        {
+            si->display(s[i]); // Display all entered student data
+        }
+    }
+
+    // Ask if the user wants to modify any student data
+    cout << "\nDo you want to modify any student details? (y/n): ";
+    cin >> ch;
+
+    if (ch == 'y' || ch == 'Y')
+    {
+        int student_number;
+        cout << "Enter the student number (0 to " << count - 1 << "): ";
+        cin >> student_number;
+
+        if (student_number >= 0 && student_number < count)
+        {
+            si->modify_data(s[student_number]); // Modify the selected student's data
+            cout << "\nModified data:" << endl;
+            si->display(s[student_number]); // Display modified data
+        }
+        else
+        {
+            cout << "Invalid student number!" << endl;
+        }
+    }
+
+    cout << "\nTotal student records: " << student::getcount() << endl;
+
+    // Clean up dynamically allocated memory
+    for (int i = 0; i < count; i++)
+    {
+        delete s[i];
+    }
+    delete si; // Delete the studentinfo object
+
+    return 0;
+}

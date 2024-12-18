@@ -1,0 +1,120 @@
+#include <iostream>
+#include <graphics.h>
+#include <cmath>
+
+using namespace std;
+
+// Define the region codes for the Cohen-Sutherland algorithm
+#define INSIDE 0  // 0000
+#define LEFT 1    // 0001
+#define RIGHT 2   // 0010
+#define BOTTOM 4  // 0100
+#define TOP 8     // 1000
+
+// Define the window boundaries
+const int X_MIN = 100, X_MAX = 500, Y_MIN = 100, Y_MAX = 400;
+
+// Function to compute the region code for a point (x, y)
+int computeCode(int x, int y) {
+    int code = INSIDE;
+
+    if (x < X_MIN)         // to the left of the window
+        code |= LEFT;
+    else if (x > X_MAX)    // to the right of the window
+        code |= RIGHT;
+    if (y < Y_MIN)         // below the window
+        code |= BOTTOM;
+    else if (y > Y_MAX)    // above the window
+        code |= TOP;
+
+    return code;
+}
+
+// Cohen-Sutherland Line Clipping Algorithm
+void cohenSutherlandClip(int x1, int y1, int x2, int y2) {
+    // Compute the region codes for the two endpoints
+    int code1 = computeCode(x1, y1);
+    int code2 = computeCode(x2, y2);
+    bool accept = false;
+
+    while (true) {
+        if ((code1 == 0) && (code2 == 0)) { // Both points are inside the window
+            accept = true;
+            break;
+        } else if ((code1 & code2) != 0) { // Logical AND is non-zero, both points are outside the window
+            break;
+        } else { // Some portion of the line is inside the window
+            int code_out;
+            int x, y;
+
+            // Choose one of the points that is outside the window
+            if (code1 != 0)
+                code_out = code1;
+            else
+                code_out = code2;
+
+            // Find the intersection point
+            if (code_out & TOP) { // Point is above the window
+                x = x1 + (x2 - x1) * (Y_MAX - y1) / (y2 - y1);
+                y = Y_MAX;
+            } else if (code_out & BOTTOM) { // Point is below the window
+                x = x1 + (x2 - x1) * (Y_MIN - y1) / (y2 - y1);
+                y = Y_MIN;
+            } else if (code_out & RIGHT) { // Point is to the right of the window
+                y = y1 + (y2 - y1) * (X_MAX - x1) / (x2 - x1);
+                x = X_MAX;
+            } else if (code_out & LEFT) { // Point is to the left of the window
+                y = y1 + (y2 - y1) * (X_MIN - x1) / (x2 - x1);
+                x = X_MIN;
+            }
+
+            // Update the point outside the window
+            if (code_out == code1) {
+                x1 = x;
+                y1 = y;
+                code1 = computeCode(x1, y1);
+            } else {
+                x2 = x;
+                y2 = y;
+                code2 = computeCode(x2, y2);
+            }
+        }
+    }
+
+    // If the line is accepted, draw it
+    if (accept) {
+        // Set the color to WHITE and draw the clipped line
+        setcolor(WHITE);
+        line(x1, y1, x2, y2);
+    } else {
+        cout << "Line rejected." << endl;
+    }
+}
+
+int main() {
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, (char*)"");
+
+    // Define initial coordinates of the line
+    int x1, y1, x2, y2;
+
+    // Set up the clipping window
+    rectangle(X_MIN, Y_MIN, X_MAX, Y_MAX);
+
+    // Get the line endpoints from the user
+    cout << "Enter x1: ";
+    cin >> x1;
+    cout << "Enter y1: ";
+    cin >> y1;
+    cout << "Enter x2: ";
+    cin >> x2;
+    cout << "Enter y2: ";
+    cin >> y2;
+
+    // Perform the line clipping using Cohen-Sutherland
+    cohenSutherlandClip(x1, y1, x2, y2);
+
+    getch();
+    closegraph();
+    return 0;
+}
